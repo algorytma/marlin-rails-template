@@ -373,6 +373,9 @@ const app = express();
 app.disable("x-powered-by");
 app.use(express.json({ limit: "1mb" }));
 
+// Serve frontend SPA assets
+app.use("/app", express.static(path.join(process.cwd(), "src", "public", "app")));
+
 app.get("/styles.css", (_req, res) => {
   res.sendFile(path.join(process.cwd(), "src", "public", "styles.css"));
 });
@@ -1182,6 +1185,27 @@ app.use(async (req, res) => {
 
   return proxy.web(req, res, { target: GATEWAY_TARGET });
 });
+
+// --- Boot Initializer ---
+const DATA_DIR = process.env.DATA_DIR?.trim() || path.join(os.homedir(), ".openclaw", "data");
+try {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+  
+  const activityPath = path.join(DATA_DIR, "activity.json");
+  if (!fs.existsSync(activityPath)) {
+    fs.writeFileSync(activityPath, JSON.stringify([]), "utf8");
+    log.info("boot", "Created /data/activity.json");
+  }
+
+  const projectsPath = path.join(DATA_DIR, "projects.json");
+  if (!fs.existsSync(projectsPath)) {
+    fs.writeFileSync(projectsPath, JSON.stringify({ projects: [], pipelines: [], tasks: [] }), "utf8");
+    log.info("boot", "Created /data/projects.json");
+  }
+} catch (err) {
+  log.error("boot", `Failed to initialize data files: ${err.message}`);
+}
+// ------------------------
 
 const server = app.listen(PORT, () => {
   log.info("wrapper", `listening on port ${PORT}`);
