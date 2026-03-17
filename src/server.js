@@ -8,6 +8,7 @@ import express from "express";
 import httpProxy from "http-proxy";
 import pty from "node-pty";
 import { WebSocketServer } from "ws";
+import { vfsRouter } from "./api/vfs.js";
 
 const PORT = Number.parseInt(process.env.PORT ?? "8080", 10);
 const STATE_DIR =
@@ -375,6 +376,9 @@ app.use(express.json({ limit: "1mb" }));
 
 // Serve frontend SPA assets
 app.use("/app", express.static(path.join(process.cwd(), "src", "public", "app")));
+
+// API Routes
+app.use("/api/vfs", requireSetupAuth, vfsRouter);
 
 app.get("/styles.css", (_req, res) => {
   res.sendFile(path.join(process.cwd(), "src", "public", "styles.css"));

@@ -1,12 +1,35 @@
-
+import { useState } from 'react';
+import { MainShell } from './components/layout/MainShell';
+import { FileExplorer } from './modules/files/FileExplorer';
+import { Toaster } from './components/ui/toaster';
 
 export default function App() {
+  const [activeTab, setActiveTab] = useState("files");
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case "files":
+        return <FileExplorer />;
+      case "activity":
+      case "services":
+      case "projects":
+      case "system":
+        return (
+          <div className="flex items-center justify-center h-full text-muted-foreground">
+            {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)} module coming soon.
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-background text-foreground">
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold tracking-tight">AI Ops Mission Control</h1>
-        <p className="text-muted-foreground">Platform is securely initialized and running.</p>
-      </div>
-    </div>
+    <>
+      <MainShell activeTab={activeTab} onTabChange={setActiveTab}>
+        {renderContent()}
+      </MainShell>
+      <Toaster />
+    </>
   );
 }
