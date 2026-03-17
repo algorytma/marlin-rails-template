@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { MainShell } from './components/layout/MainShell';
 import { FileExplorer } from './modules/files/FileExplorer';
+import { SSHManager } from './modules/ssh/SSHManager';
 import { Toaster } from './components/ui/toaster';
 
 export default function App() {
@@ -10,6 +11,8 @@ export default function App() {
     switch (activeTab) {
       case "files":
         return <FileExplorer />;
+      case "servers":
+        return <SSHManager />;
       case "activity":
       case "services":
       case "projects":

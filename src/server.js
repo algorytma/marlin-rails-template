@@ -8,6 +8,7 @@ import express from "express";
 import httpProxy from "http-proxy";
 import pty from "node-pty";
 import { WebSocketServer } from "ws";
+import { sshRouter } from "./api/ssh.js";
 import { vfsRouter } from "./api/vfs.js";
 
 const PORT = Number.parseInt(process.env.PORT ?? "8080", 10);
@@ -379,6 +380,7 @@ app.use("/app", express.static(path.join(process.cwd(), "src", "public", "app"))
 
 // API Routes
 app.use("/api/vfs", requireSetupAuth, vfsRouter);
+app.use("/api/ssh", requireSetupAuth, sshRouter);
 
 app.get("/styles.css", (_req, res) => {
   res.sendFile(path.join(process.cwd(), "src", "public", "styles.css"));
@@ -1205,6 +1207,27 @@ try {
   if (!fs.existsSync(projectsPath)) {
     fs.writeFileSync(projectsPath, JSON.stringify({ projects: [], pipelines: [], tasks: [] }), "utf8");
     log.info("boot", "Created /data/projects.json");
+  }
+
+  const sshInventoryPath = path.join(DATA_DIR, "ssh_inventory.json");
+  if (!fs.existsSync(sshInventoryPath)) {
+    fs.writeFileSync(sshInventoryPath, JSON.stringify({ hosts: [] }, null, 2), "utf8");
+    log.info("boot", "Created /data/ssh_inventory.json");
+  }
+
+  const sshKeyContent = process.env.SSH_PRIVATE_KEY;
+  if (sshKeyContent && sshKeyContent.trim() !== "") {
+    const parentDir = path.dirname(DATA_DIR); // ~/.openclaw
+    const sshDir = path.join(parentDir, ".ssh");
+    if (!fs.existsSync(sshDir)) {
+      fs.mkdirSync(sshDir, { recursive: true });
+    }
+    const idRsaPath = path.join(sshDir, "id_rsa");
+    // Ensure content ends with newline, required by OpenSSH
+    const parsedKey = sshKeyContent.includes("\\n") ? sshKeyContent.replace(/\\n/g, "\n") : sshKeyContent;
+    const finalKey = parsedKey.trim() + "\n";
+    fs.writeFileSync(idRsaPath, finalKey, { mode: 0o600 });
+    log.info("boot", "Provisioned /data/.ssh/id_rsa from SSH_PRIVATE_KEY");
   }
 } catch (err) {
   log.error("boot", `Failed to initialize data files: ${err.message}`);

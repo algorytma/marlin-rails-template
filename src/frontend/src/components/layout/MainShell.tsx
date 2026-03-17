@@ -1,6 +1,6 @@
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, Folder, Activity, Server, Layout, Settings } from "lucide-react";
+import { Menu, Folder, Activity, Server, Layout, Settings, Terminal } from "lucide-react";
 import React, { useState } from "react";
 
 interface MainShellProps {
@@ -11,6 +11,7 @@ interface MainShellProps {
 
 const TABS = [
   { id: "files", label: "Files", icon: Folder },
+  { id: "servers", label: "Servers", icon: Terminal },
   { id: "activity", label: "Activity", icon: Activity },
   { id: "services", label: "Services", icon: Server },
   { id: "projects", label: "Projects", icon: Layout },
