@@ -1,7 +1,8 @@
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu, Folder, Activity, Server, Layout, Settings, Terminal } from "lucide-react";
-import React, { useState } from "react";
+import React from "react";
+import { useAppStore } from "../../store/useAppStore";
 
 interface MainShellProps {
   children: React.ReactNode;
@@ -19,7 +20,7 @@ const TABS = [
 ];
 
 export function MainShell({ children, activeTab, onTabChange }: MainShellProps) {
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const { isSidebarOpen, setSidebarOpen } = useAppStore();
 
   const NavItems = () => (
     <nav className="flex flex-col gap-2 p-4">
@@ -33,7 +34,7 @@ export function MainShell({ children, activeTab, onTabChange }: MainShellProps) 
             className={`justify-start ${isActive ? "bg-accent" : ""}`}
             onClick={() => {
               onTabChange(t.id);
-              setMobileOpen(false);
+              setSidebarOpen(false);
             }}
           >
             <Icon className="mr-2 h-4 w-4" />
@@ -48,7 +49,7 @@ export function MainShell({ children, activeTab, onTabChange }: MainShellProps) 
     <div className="flex h-screen w-full flex-col bg-background">
       {/* Topbar */}
       <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
-        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+        <Sheet open={isSidebarOpen} onOpenChange={setSidebarOpen}>
           <SheetTrigger asChild>
             <Button variant="outline" size="icon" className="shrink-0 md:hidden">
               <Menu className="h-5 w-5" />

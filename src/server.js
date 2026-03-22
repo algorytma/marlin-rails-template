@@ -10,6 +10,9 @@ import pty from "node-pty";
 import { WebSocketServer } from "ws";
 import { sshRouter } from "./api/ssh.js";
 import { vfsRouter } from "./api/vfs.js";
+import { servicesRouter } from "./api/services.js";
+import { pinoLogger } from "./helpers/logger.js";
+import { startHealthScheduler } from "./helpers/healthScheduler.js";
 
 const PORT = Number.parseInt(process.env.PORT ?? "8080", 10);
 const STATE_DIR =
@@ -31,13 +34,13 @@ function writeLog(level, category, message) {
   const timestamp = new Date().toISOString();
   const line = `[${timestamp}] [${level}] [${category}] ${message}`;
 
-  const consoleFn =
-    level === "ERROR"
-      ? console.error
-      : level === "WARN"
-        ? console.warn
-        : console.log;
-  consoleFn(line);
+  if (level === "ERROR") {
+    pinoLogger.error({ category }, message);
+  } else if (level === "WARN") {
+    pinoLogger.warn({ category }, message);
+  } else {
+    pinoLogger.info({ category }, message);
+  }
 
   logRingBuffer.push(line);
   if (logRingBuffer.length > LOG_RING_BUFFER_MAX) {
@@ -381,6 +384,7 @@ app.use("/app", express.static(path.join(process.cwd(), "src", "public", "app"))
 // API Routes
 app.use("/api/vfs", requireSetupAuth, vfsRouter);
 app.use("/api/ssh", requireSetupAuth, sshRouter);
+app.use("/api/services", requireSetupAuth, servicesRouter);
 
 app.get("/styles.css", (_req, res) => {
   res.sendFile(path.join(process.cwd(), "src", "public", "styles.css"));
@@ -1230,9 +1234,15 @@ try {
     log.info("boot", "Provisioned /data/.ssh/id_rsa from SSH_PRIVATE_KEY");
   }
 } catch (err) {
-  log.error("boot", `Failed to initialize data files: ${err.message}`);
+  pinoLogger.error({ category: "boot" }, `Failed to initialize data files: ${err.message}`);
 }
 // ------------------------
+
+startHealthScheduler({
+  gatewayTarget: GATEWAY_TARGET,
+  configPath: configPath(),
+  dataDir: DATA_DIR
+});
 
 const server = app.listen(PORT, () => {
   log.info("wrapper", `listening on port ${PORT}`);

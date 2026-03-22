@@ -3,6 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import express from "express";
+import { pinoLogger } from "../helpers/logger.js";
 
 export const sshRouter = express.Router();
 
@@ -20,7 +21,7 @@ function readInventory() {
     const data = fs.readFileSync(SSH_INVENTORY_PATH, "utf8");
     return JSON.parse(data);
   } catch (err) {
-    console.error("sshRouter", `readInventory error: ${err.message}`);
+    pinoLogger.error({ category: "sshRouter" }, `readInventory error: ${err.message}`);
     return { hosts: [] };
   }
 }
@@ -32,7 +33,7 @@ function writeInventory(data) {
     fs.writeFileSync(SSH_INVENTORY_PATH, JSON.stringify(data, null, 2), "utf8");
     return true;
   } catch (err) {
-    console.error("sshRouter", `writeInventory error: ${err.message}`);
+    pinoLogger.error({ category: "sshRouter" }, `writeInventory error: ${err.message}`);
     return false;
   }
 }
@@ -146,7 +147,7 @@ sshRouter.post("/hosts/:alias/check", async (req, res) => {
 
   childProcess.exec(cmdString, (error, stdout, stderr) => {
     if (error) {
-      console.warn("sshRouter check failed:", error.message, stderr);
+      pinoLogger.warn({ category: "sshRouter" }, `ssh check failed: ${error.message} ${stderr}`);
       return res.json({
         ok: false,
         status: "error",

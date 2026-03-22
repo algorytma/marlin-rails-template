@@ -1,0 +1,22 @@
+feat: Implementation of Phase 0 to Phase 3 (Infrastructure & Monitoring)
+
+Bu commit, OpenClaw Mission Control projesinin Başlangıç (Faz 0) aşamasından Sağlık İzleme (Faz 3) aşamasına kadar olan tüm yetenek ve denetimleri içermektedir.
+
+Faz 0: Başlangıç ve Altyapı
+- AGENTS.md / GEMINI.md anayasası oluşturuldu (Zustand, Pino, resolveSafePath kuralları atandı).
+- Güvenli dizin çözümleyici ve Pino Logger (`logger.js`) backend'e entegre edildi.
+- `bootInitializer` mantığıyla veri yapıları izole `/data` volume'una taşındı.
+
+Faz 1-2.5: Dosya, SSH Yönetimi ve Premium UI Uyumluluğu
+- `/api/vfs` ve `/api/ssh` endpoint'leri anayasa kuralları (`requireSetupAuth`, Pino loglama) çerçevesinde denetlendi ve iyileştirildi.
+- Arayüz global state yönetimi için `Zustand` (`useAppStore.ts`) eklendi.
+- Modern shadcn ve Tailwind entegrasyonuyla arayüz (SSHManager ve layout) premium UX seviyesine yükseltildi.
+
+Faz 3: Monitoring & Service Status
+- Arka planda 60 saniyede bir çalışan ping motoru (`healthScheduler.js`) geliştirildi.
+- Gateway, LLM, ortam yapılandırmaları ve SSH sunucuları asenkron pinglenerek in-memory health takibine alındı ve `/api/services/status` ile dışa açıldı.
+- Durum değişiklikleri otomatik olarak `activityLogger.js` üzerinden sisteme raporlandı.
+- Frontend `ServicesMonitor.tsx` modülü eklendi: Periyodik olarak (polling) veriyi çekerek CONNECTED / ERROR "badge"leri sunan premium Grid arayüz tasarlandı.
+- `package.json` yapısına Native Node.js `.env` desteği verilerek `/setup` auth bloklaması engeli aşıldı ve Vite bundle'ı üretim moduna (`npm run build`) uyarlandı.
+
+Mimari Kararlar ve İş Detayları: `ai/DECISIONS.md` ve `ai/STATUS.md` loglarına eklendi.

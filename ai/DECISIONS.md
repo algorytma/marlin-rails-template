@@ -1,0 +1,10 @@
+# Phase 0 Mimari Kararlar (Decisions)
+
+1. **Loglama (Logging):** Backend tarafında `pino` ve geliştirme ortamı için `pino-pretty` tercih edildi. `src/server.js` içindeki mevcut `writeLog` metodu, Pino loglayıcısını sarmalayarak çalışacak şekilde güncellendi.
+2. **Boot Initializer:** Sıfırdan bir `bootInitializer.js` yazmak yerine, `src/server.js`'in 1197. satırında halihazırda bulunan ve `activity.json`, `projects.json`, `ssh_inventory.json` vb. dosyaları `/data` altında yöneten mevcut sağlam yapı (isnat edilen gereksinimleri tam karşıladığı için) korundu.
+3. **Path Traversal:** Parçası olunan OpenClaw tabanında yer alan `src/helpers/pathResolver.js` incelendi; `DATA_DIR` ve `path.resolve` tabanlı güvenli dizin doğrulama algoritması gereksinimlerle %100 örtüştüğü tespit edildi ve olduğu gibi bırakıldı.
+4. **Frontend State (Zustand):** Global UI durumlarını (örn. `mobileOpen`) yönetmek için `src/frontend/src/store/useAppStore.ts` oluşturuldu ve `MainShell.tsx` içindeki yerel state (useState) ile değiştirildi.
+5. **SPA Shell Yönlendirmesi:** `setup.html` dosyası incelendi; `/app/mission-control.js` ve `.css` bağımlılıklarını barındıran tam uyumlu bir Vite build çıktısı hedeflediği doğrulandı.
+6. **Faz 1-2.5 Denetimi:** `src/api/vfs.js`'in `resolveSafePath` kuralına tam uyduğu görüldü. `src/api/ssh.js` içerisindeki `console.log` kullanımı, anayasa gereği `Pino` logger ile ( `pinoLogger.error/warn/info` ) değiştirildi. Tüm `/api/*` uç noktalarının `requireSetupAuth` korumasında olduğu teyit edildi. Frontend bileşenleri (`SSHManager`, `FileExplorer`) modern yapıyla sorunsuz bulunup onaylandı.
+7. **Faz 3 Health Scheduler:** Servis durumlarını anlık izlemek için Node içerisinde `setInterval` ile çalışan `healthScheduler.js` ve `/api/services/status` ucu yazıldı. Gateway, LLM, SSH uçlarında polling yapılıyor.
+8. **Faz 3 Services UI:** `ServicesMonitor.tsx` modern shadcn Card gridi ile modellendi. `useEffect` ile kendi kendini otomatik yenileyen (polling) reaktif bir gösterge tablosu inşa edildi.
