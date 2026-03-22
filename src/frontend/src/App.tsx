@@ -3,7 +3,7 @@ import { MainShell } from './components/layout/MainShell';
 import { FileExplorer } from './modules/files/FileExplorer';
 import { SSHManager } from './modules/ssh/SSHManager';
 import { ServicesMonitor } from './modules/services/ServicesMonitor';
-import { SkillsManager } from './modules/system/SkillsManager';
+import { SystemDashboard } from './modules/system/SystemDashboard';
 import { ActivityFeed } from './modules/activity/ActivityFeed';
 import { Toaster } from './components/ui/toaster';
 
@@ -19,7 +19,7 @@ export default function App() {
       case "services":
         return <ServicesMonitor />;
       case "system":
-        return <SkillsManager />;
+        return <SystemDashboard />;
       case "activity":
         return <ActivityFeed />;
       case "projects":

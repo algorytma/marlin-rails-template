@@ -14,6 +14,8 @@ import { servicesRouter } from "./api/services.js";
 import { activityRouter } from "./api/activity.js";
 import { pinoLogger } from "./helpers/logger.js";
 import { startHealthScheduler } from "./helpers/healthScheduler.js";
+import { appendActivityEvent } from "./helpers/activityLogger.js";
+import fileUpload from "express-fileupload";
 
 const PORT = Number.parseInt(process.env.PORT ?? "8080", 10);
 const STATE_DIR =
@@ -927,16 +929,21 @@ app.get("/setup/api/export", requireSetupAuth, async (_req, res) => {
   const tmpZip = path.join(os.tmpdir(), zipName);
 
   try {
-    const dirsToExport = [];
-    if (fs.existsSync(STATE_DIR)) dirsToExport.push(STATE_DIR);
-    if (fs.existsSync(WORKSPACE_DIR)) dirsToExport.push(WORKSPACE_DIR);
-
-    if (dirsToExport.length === 0) {
-      return res.status(404).json({ ok: false, error: "No data directories found to export." });
+    const backupDir = DATA_DIR;
+    if (!fs.existsSync(backupDir)) {
+      return res.status(404).json({ ok: false, error: "No data directory found to export." });
     }
 
-    const zipArgs = ["-r", "-P", SETUP_PASSWORD, tmpZip, ...dirsToExport];
-    const result = await runCmd("zip", zipArgs);
+    const manifestPath = path.join(backupDir, "manifest.json");
+    fs.writeFileSync(manifestPath, JSON.stringify({
+      version: 1,
+      date: new Date().toISOString(),
+      openclawVersion: cachedOpenclawVersion || "unknown",
+      type: "full-backup"
+    }, null, 2));
+
+    const zipArgs = ["-r", tmpZip, ".", "-x", "logs/*", "tmp/*", "node_modules/*"];
+    const result = await runCmd("zip", zipArgs, { cwd: backupDir });
 
     if (result.code !== 0 || !fs.existsSync(tmpZip)) {
       return res.status(500).json({ ok: false, error: "Failed to create export archive.", output: result.output });
@@ -961,10 +968,37 @@ app.get("/setup/api/export", requireSetupAuth, async (_req, res) => {
         res.status(500).json({ ok: false, error: "Stream error during export." });
       }
     });
+
+    appendActivityEvent({ type: "system.export", summary: "Data exported" });
   } catch (err) {
     try { fs.rmSync(tmpZip, { force: true }); } catch {}
     log.error("export", `error: ${err.message}`);
     return res.status(500).json({ ok: false, error: `Export failed: ${err.message}` });
+  }
+});
+
+app.post("/api/backup/restore", requireSetupAuth, fileUpload({ useTempFiles: true }), async (req, res) => {
+  try {
+    if (!req.files || !req.files.backup) {
+      return res.status(400).json({ ok: false, error: "No backup file uploaded" });
+    }
+    const backupFile = req.files.backup;
+    
+    const args = ["-o", backupFile.tempFilePath, "-d", DATA_DIR];
+    const result = await runCmd("unzip", args);
+    
+    try { fs.rmSync(backupFile.tempFilePath, { force: true }); } catch {}
+
+    if (result.code !== 0) {
+      return res.status(500).json({ ok: false, error: "Failed to unzip backup", details: result.output });
+    }
+
+    appendActivityEvent({ type: "system.restore", summary: "Full backup restored to DATA_DIR" });
+    await restartGateway();
+
+    return res.json({ ok: true, message: "Restore complete. Gateway restarted." });
+  } catch(err) {
+    return res.status(500).json({ ok: false, error: err.message });
   }
 });
 

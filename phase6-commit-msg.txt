@@ -1,0 +1,20 @@
+feat: Implementation of Phase 6 (Full Backup & Restore)
+
+Faz 6 hedefleri eksiksiz şekilde tamamlandı ve projeye entegre edildi:
+
+Backend:
+- `express-fileupload` pakedi projeye dâhil edilerek dosya upload altyapısı kuruldu.
+- `GET /setup/api/export` API'si yenilendi: ZIP export işlemi esnasında kök dizine `/data` tabanlı metadata bilgilerini taşıyan `manifest.json` otomatik eklendi. (Gereksiz klasörler hariç tutuldu).
+- `POST /api/backup/restore` API'si yazıldı: Yüklenen `.zip` arşivi native `unzip` komutuyla doğrudan `tmp` üzerinden `/data` klasörüne extract (merge + overwrite) ediliyor ve ardından ağ geçidi (gateway) asenkron olarak yeniden başlatılıyor. (API %requireSetupAuth ve 500MB ile sınırlı)
+- Backup eylemlerinin tümü (export ve restore) Faz 5'te yapılan Activity havuzuna (activity.json) loglandı.
+
+Frontend:
+- `SkillsManager.tsx`'ı domine eden eski `System` sekmesi, yepyeni bir `SystemDashboard.tsx` mimarisine kavuşturuldu.
+- `SystemDashboard` kendi içinde lokal sekmelere ayrıldı: "Skills & Config" ve "Backup & Restore".
+- Yeni `BackupManager.tsx` bileşeni tasarlanıp eklendi:
+  - "Export Data" kartı ile yapılandırmanın tek tıkla zıplenip (.zip formatında) güvenli indirilmesi sağlandı.
+  - "Restore Data" kartı ile .zip yükleme (file input) eklendi.
+  - Shadcn `Dialog` yapısı kullanılarak yıkıcı Restore işlemi öncesi kullanıcıya "Mevcut yapılandırmalar ezilecek" güvencesi (kırmızı uyarılar eşliğinde) sunuldu. Upload işlemi sürecinde UI kitlenmesi sağlandı.
+
+Mimari Kayıtlar:
+- `ai/STATUS.md`, `ai/DECISIONS.md` ve `task.md` Phase 6 kapsamıyla güncellenip kayıt altına alındı.

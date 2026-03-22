@@ -13,6 +13,7 @@
 - **Phase 3 (Monitoring):** `healthScheduler.js` modülü Node.js arkasında 60 sn'de bir ping atacak biçimde devreye alındı. Gateway, LLM ve SSH hedefleri canlı denetleniyor. Frontend'de `ServicesMonitor.tsx` arayüzü ve oto-yenilenen rozet (Badge) ekranları oluşturuldu.
 - **Phase 4 (NIM & Skills):** Setup sihirbazında NVIDIA NIM parametreleri eklendi ve Backend `server.js`'e Gateway-compatible Generic OpenAI olarak proxy uyarlaması sağlandı. Frontend "System" tabı `SkillsManager.tsx` ile donatılıp `/data/workspace/skills` dizinindeki yetenekleri Monaco editörü üzerinden düzenleme özelliği getirildi.
 - **Phase 5 (Activity Feed):** Backend `activityLogger.js` (2000 event limitli rotasyon) altyapısının `GET /api/activity` REST API ucu olarak sunulması işlemi sağlandı. Frontend'de modern `ActivityFeed.tsx` tasarlanarak `vfs` eventleri, servis durumları gibi bilgilerin renklendirilmiş (badge) şekilde sunulması ve kategorize (filtre) edilmesi başarıyla arşivlendi. Etkinlik detayları Shadcn Dialogları ile modal gösterimine alındı.
+- **Phase 6 (Backup & Restore):** Kullanıcının tüm yapılandırmaları ve yetenekleri (Skills/Data) dışa aktarabileceği `/setup/api/export` API'si metadata barındıran ZIP (`manifest.json`) ile genişletildi. Sunucu tarafında `express-fileupload` eklentisiyle `/api/backup/restore` REST ucu yazılarak yedekten geri dönüş altyapısı kuruldu. Frontend "System" tabı `SystemDashboard`'a dönüştürüldü ve yeni `BackupManager.tsx` aracılığıyla yıkıcı Upload işlemlerine interaktif onay paneli getirildi.
 
 **Sonraki Adımlar:**
-Phase 6 Full /data Backup & Restore görevlerine geçilebilir.
+Artık Mission Control paneli büyük oranda tamamlandı, ileri vizyonlu modül ilaveleri projenin durumuna göre analiz edilebilir.
