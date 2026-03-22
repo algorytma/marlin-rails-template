@@ -11,6 +11,7 @@ import { WebSocketServer } from "ws";
 import { sshRouter } from "./api/ssh.js";
 import { vfsRouter } from "./api/vfs.js";
 import { servicesRouter } from "./api/services.js";
+import { activityRouter } from "./api/activity.js";
 import { pinoLogger } from "./helpers/logger.js";
 import { startHealthScheduler } from "./helpers/healthScheduler.js";
 
@@ -385,6 +386,7 @@ app.use("/app", express.static(path.join(process.cwd(), "src", "public", "app"))
 app.use("/api/vfs", requireSetupAuth, vfsRouter);
 app.use("/api/ssh", requireSetupAuth, sshRouter);
 app.use("/api/services", requireSetupAuth, servicesRouter);
+app.use("/api/activity", requireSetupAuth, activityRouter);
 
 app.get("/styles.css", (_req, res) => {
   res.sendFile(path.join(process.cwd(), "src", "public", "styles.css"));

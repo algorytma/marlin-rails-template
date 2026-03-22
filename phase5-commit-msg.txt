@@ -1,0 +1,18 @@
+feat: Implementation of Phase 5 (Activity Feed)
+
+Faz 5 süreçleri (Log Rotasyonu ve Activity İzleme Arayüzü) başarıyla tamamlandı:
+
+Backend:
+- `src/helpers/activityLogger.js` içerisine JSON tabanlı Activity Logger rotasyonu (Max 2000 log) doğrulanıp stabil hale getirildi.
+- `GET /api/activity?limit=<N>` REST API ucu tasarlandı ve entegre edildi (`src/api/activity.js`).
+- Backend servis mimarisi (VFS ve Health motorları) etkinliklerini bu havuza başarılı şekilde entegre edebilecek aşamada.
+
+Frontend:
+- shadcn/ui "badge" ve "dialog" UI modülleri projeye yüklendi.
+- `src/frontend/src/modules/activity/ActivityFeed.tsx` tasarlanarak `vfs` eventleri, servis durumları gibi bilgilerin renklendirilerek listelenmesi (Service, File, Config, vb.) sağlandı. 
+- Filtreleme butonları eklendi.
+- JSON yapılandırma bilgilerini Modal (<Dialog>) üzerinden görüntüleme desteği eklendi.
+- "Activity" sekmesi SPA'ye (App.tsx) entegre edildi.
+
+Mimari Kayıtlar:
+- `ai/DECISIONS.md` ve `ai/STATUS.md` logları Faz 5 için güncellendi. İstikrarlı geliştirme kültürü sürdürülüyor.

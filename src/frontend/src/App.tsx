@@ -4,6 +4,7 @@ import { FileExplorer } from './modules/files/FileExplorer';
 import { SSHManager } from './modules/ssh/SSHManager';
 import { ServicesMonitor } from './modules/services/ServicesMonitor';
 import { SkillsManager } from './modules/system/SkillsManager';
+import { ActivityFeed } from './modules/activity/ActivityFeed';
 import { Toaster } from './components/ui/toaster';
 
 export default function App() {
@@ -20,6 +21,7 @@ export default function App() {
       case "system":
         return <SkillsManager />;
       case "activity":
+        return <ActivityFeed />;
       case "projects":
         return (
           <div className="flex items-center justify-center h-full text-muted-foreground">
