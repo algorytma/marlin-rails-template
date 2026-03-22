@@ -1,0 +1,16 @@
+feat: Implementation of Phase 4 (NVIDIA NIM & Skill Automation)
+
+Faz 4 süreçleri AGENTS.md anayasasına sadık kalınarak başarıyla tamamlandı:
+
+Backend:
+- `openclaw.json` (Setup Wizard) yapılandırmasına NIM desteği eklendi. `VALID_AUTH_CHOICES` parametresi `nvidia-nim` değerini tanıyacak şekilde güncellendi.
+- NIM Gateway Proxy ayarları için `openaiApiBaseUrl` override işlemi yapılandırılıp NIM'in Generic OpenAI uyumlu çalışması sağlandı.
+- `bootInitializer.js` güncellenerek `/data/workspace/skills` yetenek dizini varsayılan olarak izole ve güvenli klasörde oluşturuldu.
+
+Frontend:
+- Mission Control "System" sekmesine entegre `SkillsManager.tsx` UI kodu yazıldı.
+- `vfs` API üzerinden dinamik yetenek (`workspace/skills/*.json`/`*.yaml`) listeleme yapıldı.
+- `EditorPane.tsx` (Monaco) bileşeni bağlanarak yetenek yapılandırmalarını anlık görüntüleyip kaydetme (Ctrl+S) yeteneği arayüze kazandırıldı.
+
+Mimari Kayıtlar:
+- `ai/DECISIONS.md` ve `ai/STATUS.md` dosyaları Faz 4 bitişi için başarıyla güncellendi.

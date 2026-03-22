@@ -433,6 +433,12 @@ app.get("/setup/api/status", requireSetupAuth, async (_req, res) => {
 
   const authGroups = [
     {
+      value: "nim",
+      label: "NVIDIA NIM",
+      hint: "Generic OpenAI Provider",
+      options: [{ value: "nvidia-nim", label: "NVIDIA NIM API key" }],
+    },
+    {
       value: "openai",
       label: "OpenAI",
       hint: "API key",
@@ -577,6 +583,7 @@ function buildOnboardArgs(payload) {
       "minimax-api-lightning": "--minimax-api-key",
       "synthetic-api-key": "--synthetic-api-key",
       "opencode-zen": "--opencode-zen-api-key",
+      "nvidia-nim": "--openai-api-key",
     };
     const flag = map[payload.authChoice];
     if (flag && secret) {
@@ -628,6 +635,7 @@ const VALID_AUTH_CHOICES = [
   "copilot-proxy",
   "synthetic-api-key",
   "opencode-zen",
+  "nvidia-nim",
 ];
 
 function validatePayload(payload) {
@@ -769,6 +777,16 @@ app.post("/setup/api/run", requireSetupAuth, async (req, res) => {
           botToken: payload.slackBotToken?.trim() || undefined,
           appToken: payload.slackAppToken?.trim() || undefined,
         });
+      }
+
+      if (payload.authChoice === "nvidia-nim") {
+        extra += "\n[setup] Configuring NIM as Generic OpenAI...\n";
+        // Override the baseUrl for OpenAI to point to NIM
+        const nimResult = await runCmd(
+          OPENCLAW_NODE,
+          clawArgs(["config", "set", "openaiApiBaseUrl", "https://integrate.api.nvidia.com/v1"])
+        );
+        extra += `[config] openaiApiBaseUrl exit=${nimResult.code}\n`;
       }
 
       extra += "\n[setup] Starting gateway...\n";

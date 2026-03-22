@@ -8,6 +8,12 @@ export function initDataFiles() {
   try {
     fs.mkdirSync(DATA_DIR, { recursive: true });
     
+    const skillsDir = path.join(DATA_DIR, 'workspace', 'skills');
+    if (!fs.existsSync(skillsDir)) {
+      fs.mkdirSync(skillsDir, { recursive: true });
+      console.log(`[boot] Created ${skillsDir}`);
+    }
+    
     const activityPath = path.join(DATA_DIR, 'activity.json');
     if (!fs.existsSync(activityPath)) {
       fs.writeFileSync(activityPath, '[]', 'utf8');
